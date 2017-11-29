@@ -6,13 +6,15 @@ app.listen(3030, function () {
   console.log('server running on port 3030');
 })
 
-app.get('/squareiterations', squareIterations);
+app.get('/predict', predict);
 
-function squareIterations(req, res) {
+function predict(req, res) {
     var options = {
         args:
         [
-            req.query.iterations
+            req.query.interactions,
+            req.query.peopleCount,
+            req.query.attendance
         ]
     }
     PythonShell.run('./predict.py', options, function (err, data) {
