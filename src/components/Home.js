@@ -169,7 +169,7 @@ class Home extends Component{
                             <input type="text" onChange={this.handleOnChangePeopleCount} value={peopleCount}/>
                         </div>
                         <div>
-                            <label>Presence Percentage</label>
+                            <label>Attendance</label>
                             <input type="text" onChange={this.handleOnChangePercentage} value={percentage * 100}/>
                         </div>
                         <div>
