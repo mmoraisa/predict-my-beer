@@ -2,18 +2,11 @@ import sys
 import numpy as np
 import json
 
-# interactions = int(sys.argv[1])
-# peopleCount = float(sys.argv[2])
-# attendance = float(sys.argv[3]) / 100
-# drinkMin = int(sys.argv[4])
-# drinkMax = int(sys.argv[5])
-
-
-interactions = int(100)
-peopleCount = float(25)
-attendance = float(80) / 100
-drinkMin = int(400)
-drinkMax = int(800)
+interactions = int(sys.argv[1])
+peopleCount = float(sys.argv[2])
+attendance = float(sys.argv[3]) / 100
+drinkMin = int(sys.argv[4])
+drinkMax = int(sys.argv[5])
 
 def predict():
     binomialDistribution = np.random.binomial(peopleCount,attendance,interactions).tolist()
