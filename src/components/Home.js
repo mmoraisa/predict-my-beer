@@ -1,6 +1,11 @@
 import React, { Component } from "react"
 import BarChart from './BarChart'
 
+import { predict } from '../actions/predictActions'
+
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+
 import './Home.css'
 
 var PD = require("probability-distributions");
@@ -20,8 +25,14 @@ class Home extends Component{
     }
 
     generate = () => {
+
+        const { predict } = this.props
         const { interactions, peopleCount, percentage, drinkMin, drinkMax } = this.state
-        return this.monteCarlo(interactions,peopleCount,percentage,drinkMin,drinkMax)
+
+        predict(interactions,peopleCount,percentage,drinkMin,drinkMax)
+
+        
+        //return this.monteCarlo(interactions,peopleCount,percentage,drinkMin,drinkMax)
     }
 
     monteCarlo = (interactions,peopleCount,percentage,drinkMin,drinkMax) => {
@@ -197,4 +208,10 @@ class Home extends Component{
 
 }
 
-export default Home
+function mapStateToProps({ prediction }){
+    return { prediction }
+}
+
+export default withRouter(connect(mapStateToProps, {
+    predict
+})(Home))
