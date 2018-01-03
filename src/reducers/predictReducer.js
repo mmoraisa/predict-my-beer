@@ -5,7 +5,7 @@ function predictReducer(state = [], action){
 
     switch(type){
         case ActionsTypes.PREDICT:
-            return eval(prediction)
+            return prediction
         default:
             return state
     }

@@ -17,100 +17,14 @@ class Home extends Component{
         drinkMin: 400,
         drinkMax: 800,
         peopleCount: 10,
-        percentage: 0.8,
-        presentPeople: [],
-        beerConsumeSeparetedInBlocks: [],
-        beerConsumeAverage: 0,
-        standardDeviation: 0
+        percentage: 0.8
     }
 
     generate = () => {
-
         const { predict } = this.props
         const { interactions, peopleCount, percentage, drinkMin, drinkMax } = this.state
 
         predict(interactions,peopleCount,percentage,drinkMin,drinkMax)
-
-        
-        //return this.monteCarlo(interactions,peopleCount,percentage,drinkMin,drinkMax)
-    }
-
-    monteCarlo = (interactions,peopleCount,percentage,drinkMin,drinkMax) => {
-        const presentPeople = []
-        
-        const binomialDistribution = PD.rbinom(interactions, peopleCount, percentage)
-
-        let len
-        for(let i = 1; i <= interactions; i++){
-            len = binomialDistribution.filter(_ => _ === i).length
-            if(len > 0)
-                presentPeople.push({ x: i, y: (len / interactions * 100) })
-        }
-
-        const beerConsume = []
-        const uniformDistribution = PD.runif(interactions, drinkMin, drinkMax)
-        
-        let uniformValue;
-        binomialDistribution.forEach((binomialValue,i) => {
-            uniformValue = uniformDistribution[i];
-            beerConsume[i] = binomialValue * uniformValue
-        });
-
-        const beerConsumeAverage = this.calculateAverage(beerConsume)
-        const standardDeviation = this.calculateStdDeviation(beerConsume)
-
-        const minValue = Math.round(this.getMinValue(beerConsume))
-        const maxValue = Math.round(this.getMaxValue(beerConsume))
-        
-        const beerConsumeSeparetedInBlocks = [];
-
-        const stepsCount = 15;
-        const stepSize = (maxValue - minValue) / stepsCount;
-
-        const calculateBlock = (beerConsume,minValue,maxValue,stepSize,i) => {
-            const minValueInStep = minValue + stepSize * (i - 1)
-            const maxValueInStep = minValue + stepSize * i
-            const countInStep = beerConsume.filter(_ => _ >= minValueInStep && _ < maxValueInStep).length
-            return { x: minValueInStep, y: countInStep }
-        }
-
-        for(let i = 1; i <= stepsCount; i++){
-            beerConsumeSeparetedInBlocks.push(calculateBlock(beerConsume,minValue,maxValue,stepSize,i))
-        }
-
-        this.setState({
-            presentPeople: presentPeople,
-            beerConsumeSeparetedInBlocks: beerConsumeSeparetedInBlocks,
-            beerConsumeAverage: beerConsumeAverage,
-            standardDeviation: standardDeviation
-        })
-    }
-    
-    getMinValue = dataArray => {
-        let minValue = dataArray[0]
-
-        for(let val of dataArray)
-            if(val < minValue)
-                minValue = val
-        
-        return minValue
-    }
-    
-    getMaxValue = dataArray => {
-        let maxValue = dataArray[0]
-
-        for(let val of dataArray)
-            if(val > maxValue)
-                maxValue = val
-        
-        return maxValue
-    }
-
-    calculateAverage = data => data.reduce((acc,val) => acc+val,0) / data.length
-
-    calculateStdDeviation = data => {
-        const avg = this.calculateAverage(data)
-        return Math.sqrt(data.reduce((acc,val) => acc + Math.pow(val-avg,2),0) / data.length)
     }
     
     handleOnChangeInteractions = evt => {
@@ -160,11 +74,14 @@ class Home extends Component{
             percentage,
             drinkMin,
             drinkMax,
-            beerConsumeSeparetedInBlocks,
-            presentPeople,
-            beerConsumeAverage,
-            standardDeviation
         } = this.state
+
+        const {
+            beerConsumeAverage = 0,
+            standardDeviation = 0,
+            presentPeople = [],
+            beerConsumeSeparetedInBlocks = []
+        } = this.props
 
         return (
             <div className="home">
@@ -208,8 +125,13 @@ class Home extends Component{
 
 }
 
-function mapStateToProps({ prediction }){
-    return { prediction }
+function mapStateToProps({ beerConsumeAverage, standardDeviation, presentPeople, beerConsumeSeparetedInBlocks }){
+    return {
+        beerConsumeAverage,
+        standardDeviation,
+        presentPeople,
+        beerConsumeSeparetedInBlocks
+    }
 }
 
 export default withRouter(connect(mapStateToProps, {
