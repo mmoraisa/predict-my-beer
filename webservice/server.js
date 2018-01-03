@@ -1,15 +1,20 @@
-var express = require('express');
-var PythonShell = require('python-shell');
-var app = express();
+require('dotenv').config()
+const express = require('express')
+const PythonShell = require('python-shell')
+const app = express()
 
-app.listen(3030, function () {
-  console.log('server running on port 3030');
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const config = require('./config')
+
+app.use(cors())
+
+app.listen(config.port, function () {
+  console.log(`server running on port ${config.port}`);
 })
 
-app.get('/predict', predict);
-
-function predict(req, res) {
-    var options = {
+app.get('/predict', (req, res) => {
+    const options = {
         args:
         [
             req.query.interactions,
@@ -19,9 +24,9 @@ function predict(req, res) {
             req.query.drinkMax
         ]
     }
-    PythonShell.run('./predict.py', options, function (err, data) {
+    PythonShell.run('./predict.py', options, (err, data) => {
         console.log(data)
-        if (err) res.send(err);
+        if (err) res.send(err)
         res.send(data.toString())
     });
-}
+});
