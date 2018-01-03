@@ -45,7 +45,7 @@ def predict():
         'beerConsume': beerConsume,
         'beerConsumeAverage': beerConsumeAverage,
         'standardDeviation': standardDeviation,
-        'beerConsumeSeparetedInBlocks': beerConsumeSeparetedInBlocks
+        'beerConsumeSeparatedInBlocks': beerConsumeSeparetedInBlocks
     }
     print(str(results))
     sys.stdout.flush()

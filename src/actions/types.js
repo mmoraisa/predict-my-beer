@@ -1,1 +1,1 @@
-export const PREDICT = 'PREDICT';
+export const PREDICT = 'PREDICT'

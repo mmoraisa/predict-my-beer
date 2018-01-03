@@ -1,14 +1,12 @@
 import React, { Component } from "react"
 import BarChart from './BarChart'
 
-import { predict } from '../actions/predictActions'
+import { predictFromBackend, predictFromFrontend } from '../actions/predictActions'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import './Home.css'
-
-var PD = require("probability-distributions");
 
 class Home extends Component{
 
@@ -17,14 +15,19 @@ class Home extends Component{
         drinkMin: 400,
         drinkMax: 800,
         peopleCount: 10,
-        percentage: 0.8
+        percentage: 80,
+        fetchType: 'F'
     }
 
     generate = () => {
-        const { predict } = this.props
-        const { interactions, peopleCount, percentage, drinkMin, drinkMax } = this.state
+        const { predictFromBackend, predictFromFrontend } = this.props
+        const { interactions, peopleCount, percentage, drinkMin, drinkMax, fetchType } = this.state
 
-        predict(interactions,peopleCount,percentage,drinkMin,drinkMax)
+        if(fetchType === 'F'){
+            predictFromFrontend(interactions,peopleCount,percentage,drinkMin,drinkMax)
+        } else{
+            predictFromBackend(interactions,peopleCount,percentage,drinkMin,drinkMax)
+        }
     }
     
     handleOnChangeInteractions = evt => {
@@ -43,7 +46,7 @@ class Home extends Component{
     
     handleOnChangePercentage = evt => {
         let intVal = parseInt(evt.target.value,10)
-        intVal = Number.isNaN(intVal) ? 0 : intVal / 100
+        intVal = Number.isNaN(intVal) ? 0 : intVal
         this.setState({
             percentage: intVal > 100 ? 100 : intVal
         })
@@ -63,6 +66,12 @@ class Home extends Component{
         })
     }
 
+    handleFetchTypeChange = evt => {
+        this.setState({
+            fetchType: evt.target.value
+        })
+    }
+
     componentWillMount = () => {
         this.generate()
     }
@@ -74,13 +83,14 @@ class Home extends Component{
             percentage,
             drinkMin,
             drinkMax,
+            fetchType
         } = this.state
 
         const {
             beerConsumeAverage = 0,
             standardDeviation = 0,
             presentPeople = [],
-            beerConsumeSeparetedInBlocks = []
+            beerConsumeSeparatedInBlocks = []
         } = this.props
 
         return (
@@ -98,7 +108,7 @@ class Home extends Component{
                         </div>
                         <div>
                             <label>Attendance</label>
-                            <input type="text" onChange={this.handleOnChangePercentage} value={percentage * 100}/>
+                            <input type="text" onChange={this.handleOnChangePercentage} value={percentage}/>
                         </div>
                         <div>
                             <label>Drink Min. (ml)</label>
@@ -109,11 +119,20 @@ class Home extends Component{
                             <input type="text" onChange={this.handleOnChangeDrinkMax} value={drinkMax}/>
                         </div>
                     </div>
+                    <div className="fetch-types">
+                        <label>Calulating by:</label>
+                        <label>
+                            <input name="fetch_type" value="B" type="radio" onChange={this.handleFetchTypeChange} checked={fetchType === 'B'}/> Backend with Python and Numpy library
+                        </label>
+                        <label>
+                            <input name="fetch_type" value="F" type="radio" onChange={this.handleFetchTypeChange} checked={fetchType === 'F'}/> Frontend with Probability Distribution library
+                        </label>
+                    </div>
                     <button onClick={this.generate}><i className="fa fa-refresh"></i>Update</button>
                 </div>
                 <div className="output-data">
                     <BarChart data={presentPeople} showYAxis={true}/>
-                    <BarChart data={beerConsumeSeparetedInBlocks}/>
+                    <BarChart data={beerConsumeSeparatedInBlocks}/>
                 </div>
                 <div className="output-extra-info">
                     <label>Average<br/>{ parseFloat(beerConsumeAverage.toFixed(2)) }</label>
@@ -125,15 +144,16 @@ class Home extends Component{
 
 }
 
-function mapStateToProps({ beerConsumeAverage, standardDeviation, presentPeople, beerConsumeSeparetedInBlocks }){
+function mapStateToProps({ beerConsumeAverage, standardDeviation, presentPeople, beerConsumeSeparatedInBlocks }){
     return {
         beerConsumeAverage,
         standardDeviation,
         presentPeople,
-        beerConsumeSeparetedInBlocks
+        beerConsumeSeparatedInBlocks
     }
 }
 
 export default withRouter(connect(mapStateToProps, {
-    predict
+    predictFromBackend,
+    predictFromFrontend
 })(Home))
